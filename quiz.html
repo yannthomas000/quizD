@@ -1,0 +1,436 @@
+<!-- quiz.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz sur les Drapeaux</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #000; /* Arrière-plan noir */
+            color: #fff; /* Texte blanc */
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        #quiz-container {
+            text-align: center;
+            background-color: #333; /* Boîte du quiz en gris foncé */
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #flag-image {
+            max-width: 100%;
+            max-height: 200px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        #answer-input {
+            padding: 8px;
+            font-size: 16px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        #feedback-text {
+            margin-top: 10px;
+            font-size: 18px;
+            color: green; /* Couleur du texte pour une réponse correcte */
+        }
+
+        #country-name {
+            margin-top: 10px;
+            font-size: 18px;
+            display: none; /* Cacher le nom du pays par défaut */
+        }
+
+        #pass-button {
+            background-color: #555; /* Couleur du bouton "Passer" */
+            margin-top: 10px;
+        }
+
+        #show-name-button {
+            background-color: #555; /* Couleur du bouton "Afficher le nom du pays" */
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="quiz-container">
+        <h1>Quiz sur les Drapeaux</h1>
+        <img id="flag-image" src="" alt="Drapeau">
+        <input type="text" id="answer-input" placeholder="Entrez le nom du pays" onkeydown="if(event.keyCode===13) checkAnswer(event)">
+        <p id="feedback-text"></p>
+        <p id="country-name"></p>
+        <button id="pass-button" onclick="displayFlag()">Passer</button>
+        <button id="show-name-button" onclick="showCountryName()">Afficher le nom du pays</button>
+        <p id="score">Score : 0</p>
+        <p id="remaining-countries">Pays restants : 0</p>
+    </div>
+
+    <script>
+        const countries = [
+
+            { name: "Afghanistan", flag: "drapeau/Flag_of_the_Taliban.svg.png"},
+            { name: "Afrique du Sud", flag: "drapeau/Flag_of_South_Africa.svg.png"},
+            { name: "Albanie", flag: "drapeau/Flag_of_Albania.svg.png" },
+            { name: "Algérie", flag: "drapeau/Flag_of_Algeria.svg.png" },
+            { name: "Allemagne", flag: "drapeau/Flag_of_Germany.svg.png" },
+            { name: "Andorre", flag: "drapeau/Flag_of_Andorra.svg.png" },
+            { name: "Angola", flag: "drapeau/Flag_of_Angola.svg.png" },
+            { name: "Antigua-et-Barbuda", flag: "drapeau/Flag_of_Antigua_and_Barbuda.svg.png" },
+            { name: "Arabie saoudite", flag: "drapeau/Flag_of_Saudi_Arabia.svg.png" },
+            { name: "Argentine", flag: "drapeau/Flag_of_Argentina.svg.png" },
+            { name: "Arménie", flag: "drapeau/Flag_of_Armenia.svg.png" },
+            { name: "Australie", flag: "drapeau/Flag_of_Australia.svg.png" },
+            { name: "Autriche", flag: "drapeau/Flag_of_Austria.svg.png" },
+            { name: "Azerbaïdjan", flag: "drapeau/Flag_of_Azerbaijan.svg.png" },
+
+            { name: "Bahamas", flag: "drapeau/Flag_of_The_Bahamas.svg.png" },
+            { name: "Bahreïn", flag: "drapeau/Flag_of_Bahrain.svg.png" },
+            { name: "Bangladesh", flag: "drapeau/Flag_of_Bangladesh.svg.png" },
+            { name: "Barbade", flag: "drapeau/Flag_of_Barbados.svg.png" },
+            { name: "Belgique", flag: "drapeau/Flag_of_Belgium.svg.png" },
+            { name: "Belize", flag: "drapeau/Flag_of_Belize.svg.png" },
+            { name: "Bénin", flag: "drapeau/Flag_of_Benin.svg.png" },
+            { name: "Bhoutan", flag: "drapeau/Flag_of_Bhutan.svg.png" },
+            { name: "Biélorussie", flag: "drapeau/Flag_of_Belarus.svg.png" },
+            { name: "Birmanie", flag: "drapeau/Flag_of_Myanmar.svg.png" },
+            { name: "Bolivie", flag: "drapeau/Flag_of_Bolivia.svg.png" },
+            { name: "Bosnie-Herzégovine", flag: "drapeau/Flag_of_Bosnia_and_Herzegovina.svg.png" },
+            { name: "Botswana", flag: "drapeau/Flag_of_Botswana.svg.png" },
+            { name: "Brésil", flag: "drapeau/Flag_of_Brazil.svg.png" },
+            { name: "Brunei", flag: "drapeau/Flag_of_Brunei.svg.png" },
+            { name: "Bulgarie", flag: "drapeau/Flag_of_Bulgaria.svg.png" },
+            { name: "Burkina Faso", flag: "drapeau/Flag_of_Burkina_Faso.svg.png" },
+            { name: "Burundi", flag: "drapeau/Flag_of_Burundi.svg.png" },
+
+            { name: "Cambodge", flag: "drapeau/Flag_of_Cambodia.svg.png" },
+            { name: "Cameroun", flag: "drapeau/Flag_of_Cameroon.svg.png" },
+            { name: "Canada", flag: "drapeau/Flag_of_Canada.svg.png" },
+            { name: "Cap-Vert", flag: "drapeau/Flag_of_Cape_Verde.svg.png" },
+            { name: "Chili", flag: "drapeau/Flag_of_Chile.svg.png" },
+            { name: "Chine", flag: "drapeau/Flag_of_China.svg.png" },
+            { name: "Chypre", flag: "drapeau/Flag_of_Cyprus.svg.png" },
+            { name: "Colombie", flag: "drapeau/Flag_of_Colombia.svg.png" },
+            { name: "Comores", flag: "drapeau/Flag_of_the_Comoros.svg.png" },
+            { name: "Corée du Nord", flag: "drapeau/Flag_of_North_Korea.svg.png" },
+            { name: "Corée du Sud", flag: "drapeau/Flag_of_South_Korea.svg.png" },
+            { name: "Costa Rica", flag: "drapeau/Flag_of_Costa_Rica.svg.png" },
+            { name: "Côte d’Ivoire", flag: "drapeau/Flag_of_Cote_dIvoire.svg.png" },
+            { name: "Croatie", flag: "drapeau/Flag_of_Croatia.svg.png" },
+            { name: "Cuba", flag: "drapeau/Flag_of_Cuba.svg.png" },
+
+            { name: "Danemark", flag: "drapeau/Flag_of_Denmark.svg.png" },
+            { name: "Djibouti", flag: "drapeau/Flag_of_Djibouti.svg.png" },
+            { name: "Dominique", flag: "drapeau/Flag_of_Dominica.svg.png" },
+
+            { name: "Égypte", flag: "drapeau/Flag_of_Egypt.svg.png" },
+            { name: "Émirats arabes unis", flag: "drapeau/Flag_of_the_United_Arab_Emirates.svg.png" },
+            { name: "Équateur", flag: "drapeau/Flag_of_Ecuador.svg.png" },
+            { name: "Érythrée", flag: "drapeau/Flag_of_Eritrea.svg.png" },
+            { name: "Espagne", flag: "drapeau/Flag_of_Spain.svg.png" },
+            { name: "Eswatini", flag: "drapeau/Flag_of_Eswatini.svg.png" },
+            { name: "Estonie", flag: "drapeau/Flag_of_Estonia.svg.png" },
+            { name: "États-Unis", flag: "drapeau/Flag_of_the_United_States.svg.png" },
+            { name: "Éthiopie", flag: "drapeau/Flag_of_Ethiopia.svg.png" },
+
+            { name: "Fidji", flag: "drapeau/Flag_of_Fiji.svg.png" },
+            { name: "Finlande", flag: "drapeau/Flag_of_Finland.svg.png" },
+            { name: "France", flag: "drapeau/Flag_of_France.svg.png" },
+
+            { name: "Gabon", flag: "drapeau/Flag_of_Gabon.svg.png" },
+            { name: "Gambie", flag: "drapeau/Flag_of_The_Gambia.svg.png" },
+            { name: "Géorgie", flag: "drapeau/Flag_of_Georgia.svg.png" },
+            { name: "Ghana", flag: "drapeau/Flag_of_Ghana.svg.png" },
+            { name: "Grèce", flag: "drapeau/Flag_of_Greece.svg.png" },
+            { name: "Grenade", flag: "drapeau/Flag_of_Grenada.svg.png" },
+            { name: "Guatemala", flag: "drapeau/Flag_of_Guatemala.svg.png" },
+            { name: "Guinée", flag: "drapeau/Flag_of_Guinea.svg.png" },
+            { name: "Guinée équatoriale", flag: "drapeau/Flag_of_Equatorial_Guinea.svg.png" },
+            { name: "Guinée-Bissau", flag: "drapeau/Flag_of_Guinea-Bissau.svg.png" },
+            { name: "Guyana", flag: "drapeau/Flag_of_Guyana.svg.png" },
+
+            { name: "Haïti", flag: "drapeau/Flag_of_Haiti.svg.png" },
+            { name: "Honduras", flag: "drapeau/Flag_of_Honduras.svg.png" },
+            { name: "Hongrie", flag: "drapeau/Flag_of_Hungary.svg.png" },
+
+            { name: "Îles Cook", flag: "drapeau/Flag_of_the_Cook_Islands.svg.png" },
+            { name: "Îles Marshall", flag: "drapeau/Flag_of_the_Marshall_Islands.svg.png" },
+            { name: "Inde", flag: "drapeau/Flag_of_India.svg.png" },
+            { name: "Indonésie", flag: "drapeau/Flag_of_Indonesia.svg.png" },
+            { name: "Irak", flag: "drapeau/Flag_of_Iraq.svg.png" },
+            { name: "Iran", flag: "drapeau/Flag_of_Iran.svg.png" },
+            { name: "Irlande", flag: "drapeau/Flag_of_Ireland.svg.png" },
+            { name: "Islande", flag: "drapeau/Flag_of_Iceland.svg.png" },
+            { name: "Israël", flag: "drapeau/Flag_of_Israel.svg.png" },
+            { name: "Italie", flag: "drapeau/Flag_of_Italy.svg.png" },
+
+            { name: "Jamaïque", flag: "drapeau/Flag_of_Jamaica.svg.png" },
+            { name: "Japon", flag: "drapeau/Flag_of_Japan.svg.png" },
+            { name: "Jordanie", flag: "drapeau/Flag_of_Jordan.svg.png" },
+
+            { name: "Kazakhstan", flag: "drapeau/Flag_of_Kazakhstan.svg.png" },
+            { name: "Kenya", flag: "drapeau/Flag_of_Kenya.svg.png" },
+            { name: "Kirghizistan", flag: "drapeau/Flag_of_Kyrgyzstan.svg.png" },
+            { name: "Kiribati", flag: "drapeau/Flag_of_Kiribati.svg.png" },
+            { name: "Koweït", flag: "drapeau/Flag_of_Kuwait.svg.png" },
+
+            { name: "Laos", flag: "drapeau/Flag_of_Laos.svg.png" },
+            { name: "Lesotho", flag: "drapeau/Flag_of_Lesotho.svg.png" },
+            { name: "Lettonie", flag: "drapeau/Flag_of_Latvia.svg.png" },
+            { name: "Liban", flag: "drapeau/Flag_of_Lebanon.svg.png" },
+            { name: "Liberia", flag: "drapeau/Flag_of_Liberia.svg.png" },
+            { name: "Libye", flag: "drapeau/Flag_of_Libya.svg.png" },
+            { name: "Liechtenstein", flag: "drapeau/Flag_of_Liechtenstein.svg.png" },
+            { name: "Lituanie", flag: "drapeau/Flag_of_Lithuania.svg.png" },
+            { name: "Luxembourg", flag: "drapeau/Flag_of_Luxembourg.svg.png" },
+
+            { name: "Macédoine", flag: "drapeau/Flag_of_North_Macedonia.svg.png" },
+            { name: "Madagascar", flag: "drapeau/Flag_of_Madagascar.svg.png" },
+            { name: "Malaisie", flag: "drapeau/Flag_of_Malaysia.svg.png" },
+            { name: "Malawi", flag: "drapeau/Flag_of_Malawi.svg.png" },
+            { name: "Maldives", flag: "drapeau/Flag_of_Maldives.svg.png" },
+            { name: "Mali", flag: "drapeau/Flag_of_Mali.svg.png" },
+            { name: "Malte", flag: "drapeau/Flag_of_Malta.svg.png" },
+            { name: "Maroc", flag: "drapeau/Flag_of_Morocco.svg.png" },
+            { name: "Maurice", flag: "drapeau/Flag_of_Mauritius.svg.png" },
+            { name: "Mauritanie", flag: "drapeau/Flag_of_Mauritania.svg.png" },
+            { name: "Mexique", flag: "drapeau/Flag_of_Mexico.svg.png" },
+            { name: "Micronésie", flag: "drapeau/Flag_of_Micronesia.svg.png" },
+            { name: "Moldavie", flag: "drapeau/Flag_of_Moldova.svg.png" },
+            { name: "Monaco", flag: "drapeau/Flag_of_Monaco.svg.png" },
+            { name: "Mongolie", flag: "drapeau/Flag_of_Mongolia.svg.png" },
+            { name: "Monténégro", flag: "drapeau/Flag_of_Montenegro.svg.png" },
+            { name: "Mozambique", flag: "drapeau/Flag_of_Mozambique.svg.png" },
+
+            { name: "Namibie", flag: "drapeau/Flag_of_Namibia.svg.png" },
+            { name: "Nauru", flag: "drapeau/Flag_of_Nauru.svg.png" },
+            { name: "Népal", flag: "drapeau/Flag_of_Nepal.svg.png" },
+            { name: "Nicaragua", flag: "drapeau/Flag_of_Nicaragua.svg.png" },
+            { name: "Niger", flag: "drapeau/Flag_of_Niger.svg.png" },
+            { name: "Nigeria", flag: "drapeau/Flag_of_Nigeria.svg.png" },
+            { name: "Niue", flag: "drapeau/Flag_of_Niue.svg.png" },
+            { name: "Norvège", flag: "drapeau/Flag_of_Norway.svg.png" },
+            { name: "Nouvelle-Zélande", flag: "drapeau/Flag_of_New_Zealand.svg.png" },
+
+            { name: "Oman", flag: "drapeau/Flag_of_Oman.svg.png" },
+            { name: "Ouganda", flag: "drapeau/Flag_of_Uganda.svg.png" },
+            { name: "Ouzbékistan", flag: "drapeau/Flag_of_Uzbekistan.svg.png" },
+
+            { name: "Pakistan", flag: "drapeau/Flag_of_Pakistan.svg.png" },
+            { name: "Palaos", flag: "drapeau/Flag_of_Palau.svg.png" },
+            { name: "Palestine", flag: "drapeau/Flag_of_Palestine.svg.png" },
+            { name: "Panama", flag: "drapeau/Flag_of_Panama.svg.png" },
+            { name: "Papouasie-Nouvelle-Guinée", flag: "drapeau/Flag_of_Papua_New_Guinea.svg.png" },
+            { name: "Paraguay", flag: "drapeau/Flag_of_Paraguay.svg.png" },
+            { name: "Pays-Bas", flag: "drapeau/Flag_of_the_Netherlands.svg.png" },
+            { name: "Pérou", flag: "drapeau/Flag_of_Peru.svg.png" },
+            { name: "Philippines", flag: "drapeau/Flag_of_the_Philippines.svg.png" },
+            { name: "Pologne", flag: "drapeau/Flag_of_Poland.svg.png" },
+            { name: "Portugal", flag: "drapeau/Flag_of_Portugal.svg.png" },
+
+            { name: "Qatar", flag: "drapeau/Flag_of_Qatar.svg.png" },
+
+            { name: "République centrafricaine", flag: "drapeau/Flag_of_the_Central_African_Republic.svg.png" },
+            { name: "République démocratique du Congo", flag: "drapeau/Flag_of_the_Democratic_Republic_of_the_Congo.svg.png" },
+            { name: "République Dominicaine", flag: "drapeau/Flag_of_the_Dominican_Republic.svg.png" },
+            { name: "République du Congo", flag: "drapeau/Flag_of_the_Republic_of_the_Congo.svg.png" },
+            { name: "République tchèque", flag: "drapeau/Flag_of_the_Czech_Republic.svg.png" },
+            { name: "Roumanie", flag: "drapeau/Flag_of_Romania.svg.png" },
+            { name: "Royaume-Uni", flag: "drapeau/Flag_of_the_United_Kingdom.svg.png" },
+            { name: "Russie", flag: "drapeau/Flag_of_Russia.svg.png" },
+            { name: "Rwanda", flag: "drapeau/Flag_of_Rwanda.svg.png" },
+
+            { name: "Saint-Kitts-et-Nevis", flag: "drapeau/Flag_of_Saint_Kitts_and_Nevis.svg.png" },
+            { name: "Saint-Vincent-et-les-Grenadines", flag: "drapeau/Flag_of_Saint_Vincent_and_the_Grenadines.svg.png" },
+            { name: "Sainte-Lucie", flag: "drapeau/Flag_of_Saint_Lucia.svg.png" },
+            { name: "Saint-Marin", flag: "drapeau/Flag_of_San_Marino.svg.png" },
+            { name: "Salomon", flag: "drapeau/Flag_of_the_Solomon_Islands.svg.png" },
+            { name: "Salvador", flag: "drapeau/Flag_of_El_Salvador.svg.png" },
+            { name: "Samoa", flag: "drapeau/Flag_of_Samoa.svg.png" },
+            { name: "São Tomé-et-Principe", flag: "drapeau/Flag_of_Sao_Tome_and_Principe.svg.png" },
+            { name: "Sénégal", flag: "drapeau/Flag_of_Senegal.svg.png" },
+            { name: "Serbie", flag: "drapeau/Flag_of_Serbia.svg.png" },
+            { name: "Seychelles", flag: "drapeau/Flag_of_Seychelles.svg.png" },
+            { name: "Sierra Leone", flag: "drapeau/Flag_of_Sierra_Leone.svg.png" },
+            { name: "Singapour", flag: "drapeau/Flag_of_Singapore.svg.png" },
+            { name: "Slovaquie", flag: "drapeau/Flag_of_Slovakia.svg.png" },
+            { name: "Slovénie", flag: "drapeau/Flag_of_Slovenia.svg.png" },
+            { name: "Somalie", flag: "drapeau/Flag_of_Somalia.svg.png" },
+            { name: "Soudan", flag: "drapeau/Flag_of_Sudan.svg.png" },
+            { name: "Soudan du Sud", flag: "drapeau/Flag_of_South_Sudan.svg.png" },
+            { name: "Sri Lanka", flag: "drapeau/Flag_of_Sri_Lanka.svg.png" },
+            { name: "Suède", flag: "drapeau/Flag_of_Sweden.svg.png" },
+            { name: "Suisse", flag: "drapeau/Flag_of_Switzerland.svg.png" },
+            { name: "Suriname", flag: "drapeau/Flag_of_Suriname.svg.png" },
+            { name: "Syrie", flag: "drapeau/Flag_of_Syria.svg.png" },
+
+            { name: "Tadjikistan", flag: "drapeau/Flag_of_Tajikistan.svg.png" },
+            { name: "Tanzanie", flag: "drapeau/Flag_of_Tanzania.svg.png" },
+            { name: "Tchad", flag: "drapeau/Flag_of_Chad.svg.png" },
+            { name: "Thaïlande", flag: "drapeau/Flag_of_Thailand.svg.png" },
+            { name: "Timor oriental", flag: "drapeau/Flag_of_East_Timor.svg.png" },
+            { name: "Togo", flag: "drapeau/Flag_of_Togo.svg.png" },
+            { name: "Tonga", flag: "drapeau/Flag_of_Tonga.svg.png" },
+            { name: "Trinité-et-Tobago", flag: "drapeau/Flag_of_Trinidad_and_Tobago.svg.png" },
+            { name: "Tunisie", flag: "drapeau/Flag_of_Tunisia.svg.png" },
+            { name: "Turkménistan", flag: "drapeau/Flag_of_Turkmenistan.svg.png" },
+            { name: "Turquie", flag: "drapeau/Flag_of_Turkey.svg.png" },
+            { name: "Tuvalu", flag: "drapeau/Flag_of_Tuvalu.svg.png" },
+
+            { name: "Ukraine", flag: "drapeau/Flag_of_Ukraine.svg.png" },
+            { name: "Uruguay", flag: "drapeau/Flag_of_Uruguay.svg.png" },
+
+            { name: "Vanuatu", flag: "drapeau/Flag_of_Vanuatu.svg.png" },
+            { name: "Vatican", flag: "drapeau/Flag_of_the_Vatican_City.svg.png" },
+            { name: "Venezuela", flag: "drapeau/Flag_of_Venezuela.svg.png" },
+            { name: "Viêt Nam", flag: "drapeau/Flag_of_Vietnam.svg.png" },
+
+            { name: "Yémen", flag: "drapeau/Flag_of_Yemen.svg.png" },
+
+            { name: "Zambie", flag: "drapeau/Flag_of_Zambia.svg.png" },
+            { name: "Zimbabwe", flag: "drapeau/Flag_of_Zimbabwe.svg.png" },
+
+            { name: "Aland", flag: "drapeau/Flag_of_Aland.svg.png" },
+            { name: "Anguilla", flag: "drapeau/Flag_of_Anguilla.svg.png" },
+            { name: "Aruba", flag: "drapeau/Flag_of_Aruba.svg.png" },
+            { name: "Bonaire", flag: "drapeau/Flag_of_Bonaire.svg.png" },
+            { name: "Bermudes", flag: "drapeau/Flag_of_Bermuda.svg.png" },
+            { name: "Curaçao", flag: "drapeau/Flag_of_Curaçao.svg.png" },
+            { name: "écosse", flag: "drapeau/Flag_of_Scotland.svg.png" },
+            { name: "Angleterre", flag: "drapeau/Flag_of_England.svg.png" },
+            { name: "Géorgie du sud et les îles Sandwich du Sud", flag: "drapeau/Flag_of_South_Georgia_and_the_South_Sandwich_Islands.svg.png" },
+            { name: "Gibraltar", flag: "drapeau/Flag_of_Gibraltar.svg.png" },
+            { name: "Groenland", flag: "drapeau/Flag_of_Greenland.svg.png" },
+            { name: "Guam", flag: "drapeau/Flag_of_Guam.svg.png" },
+            { name: "Guernesey", flag: "drapeau/Flag_of_Guernsey.svg.png" },
+            { name: "Hong Kong", flag: "drapeau/Flag_of_Hong_Kong.svg.png" },
+            { name: "île Christmas", flag: "drapeau/Flag_of_Christmas_Island.svg.png" },
+            { name: "île de l'Ascension", flag: "drapeau/Flag_of_Ascension_Island.svg.png" },
+            { name: "île de Man", flag: "drapeau/Flag_of_the_Isle_of_Man.svg.png" },
+            { name: "île de Pâques", flag: "drapeau/Flag_of_Easter_Island.svg.png" },
+            { name: "île Norfolk", flag: "drapeau/Flag_of_Norfolk_Island.svg.png" },
+            { name: "îles Caïmans", flag: "drapeau/Flag_of_the_Cayman_Islands.svg.png" },
+            { name: "îles Cocos", flag: "drapeau/Flag_of_the_Cocos_Islands.svg.png" },
+            { name: "îles Féroé", flag: "drapeau/Flag_of_the_Faroe_Islands.svg.png" },
+            { name: "îles Malouines", flag: "drapeau/Flag_of_the_Falkland_Islands.svg.png" },
+            { name: "îles Mariannes du Nord", flag: "drapeau/Flag_of_the_Northern_Mariana_Islands.svg.png" },
+            { name: "îles Pitcairn", flag: "drapeau/Flag_of_the_Pitcairn_Islands.svg.png" },
+            { name: "îles Turques-et-Caïques", flag: "drapeau/Flag_of_the_Turks_and_Caicos_Islands.svg.png" },
+            { name: "îles Vierges britanniques", flag: "drapeau/Flag_of_the_British_Virgin_Islands.svg.png" },
+            { name: "Irlande du Nord", flag: "drapeau/Flag_of_Northern_Ireland.svg.png" },
+            { name: "Jersey", flag: "drapeau/Flag_of_Jersey.svg.png" },
+            { name: "Macao", flag: "drapeau/Flag_of_Macau.svg.png" },
+            { name: "Montserrat", flag: "drapeau/Flag_of_Montserrat.svg.png" },
+            { name: "Nouvelle-Calédonie", flag: "drapeau/Flag_of_New_Caledonia.svg.png" },
+            { name: "Pays de Galles", flag: "drapeau/Flag_of_Wales.svg.png" },
+            { name: "Polynésie française", flag: "drapeau/Flag_of_French_Polynesia.svg.png" },
+            { name: "Porto Rico", flag: "drapeau/Flag_of_Puerto_Rico.svg.png" },
+            { name: "Saba", flag: "drapeau/Flag_of_Saba.svg.png" },
+            { name: "Sainte-Hélène", flag: "drapeau/Flag_of_Saint_Helena.svg.png" },
+            { name: "Saint-Eustache", flag: "drapeau/Flag_of_Sint_Eustatius.svg.png" },
+            { name: "Saint-Martin", flag: "drapeau/Flag_of_Sint_Maarten.svg.png" },
+            { name: "Terres australes et antarctiques françaises", flag: "drapeau/Flag_of_the_French_Southern_and_Antarctic_Lands.svg.png" },
+            { name: "Territoire britannique de l'océan indien", flag: "drapeau/Flag_of_the_Commissioner_of_the_British_Indian_Ocean_Territory.svg.png" },
+            { name: "Tokelau", flag: "drapeau/Flag_of_Tokelau.svg.png" },
+            { name: "Tristan de Cunha", flag: "drapeau/Flag_of_Tristan_da_Cunha.svg.png" },
+
+            { name: "Guadeloupe", flag: "drapeau/Unofficial_flag_of_Guadeloupe_(local).svg.png" },
+            { name: "Martinique", flag: "drapeau/Flag-of-Martinique.svg.png" },
+            { name: "Guyane", flag: "drapeau/Coat_of_arms_of_French_Guyana.svg.png" },
+            { name: "La Réunion", flag: "drapeau/Proposed_flag_of_Réunion_(VAR).svg.png" },
+            { name: "Saint-Pierre-et-Miquelon", flag: "drapeau/1920px-Flag_of_Saint-Pierre_and_Miquelon.svg.png" },
+            { name: "Mayotte", flag: "drapeau/Coat_of_Arms_of_Mayotte.svg.png" },
+            { name: "Saint-Barthélemy", flag: "drapeau/Flag_of_Saint_Barthélemy_(local).svg.png" },
+            { name: "Saint-Martin", flag: "drapeau/langfr-1920px-Collectivité_Saint-Martin.svg.png" },
+            { name: "Wallis-et-Futuna", flag: "drapeau/Flag_of_Wallis_and_Futuna.svg.png" }
+        ];
+
+        let remainingIndices = Array.from({ length: countries.length }, (_, i) => i); // Indices restants à deviner
+        let currentIndex;
+        let score = 0;
+
+        function displayFlag() {
+            if (remainingIndices.length === 0) {
+                alert("Partie terminée. Votre score : " + score);
+                return;
+            }
+
+            const randomIndex = Math.floor(Math.random() * remainingIndices.length);
+            currentIndex = remainingIndices[randomIndex];
+            remainingIndices.splice(randomIndex, 1);
+
+            const flagImage = document.getElementById("flag-image");
+            const countryName = document.getElementById("country-name");
+
+            const imagePath = countries[currentIndex].flag;
+            flagImage.src = imagePath;
+
+            // Cacher le nom du pays précédent
+            countryName.style.display = "none";
+
+            // Effacer la zone de texte
+            document.getElementById("answer-input").value = "";
+
+            // Effacer le texte de feedback
+            document.getElementById("feedback-text").textContent = "";
+
+            // Mettre à jour le nombre de pays restants
+            updateRemainingCountries();
+        }
+
+        function checkAnswer(event) {
+            if (event) {
+                event.preventDefault(); // Empêcher le comportement par défaut (rechargement de la page) de la touche "Entrée"
+            }
+
+            const userInput = document.getElementById("answer-input").value.toLowerCase();
+            const correctAnswer = countries[currentIndex].name.toLowerCase();
+            const feedbackText = document.getElementById("feedback-text");
+
+            if (userInput === correctAnswer) {
+                feedbackText.textContent = "Bonne réponse!";
+                feedbackText.style.color = "green";
+                score++;
+                updateScore();
+                setTimeout(() => {
+                    displayFlag();
+                    feedbackText.textContent = ""; // Effacer le texte de feedback après 2 secondes
+                }, 2000);
+            } else {
+                feedbackText.textContent = "Mauvaise réponse. Essayez encore !";
+                feedbackText.style.color = "red";
+            }
+        }
+
+        function updateRemainingCountries() {
+            document.getElementById("remaining-countries").textContent = "Pays restants : " + remainingIndices.length;
+        }
+
+        function showCountryName() {
+            const countryName = document.getElementById("country-name");
+            countryName.textContent = countries[currentIndex].name;
+            countryName.style.display = "block";
+        }
+
+        function updateScore() {
+            document.getElementById("score").textContent = "Score : " + score;
+        }
+
+        displayFlag();
+    </script>
+</body>
+</html>
